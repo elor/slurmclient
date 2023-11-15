@@ -32,25 +32,22 @@ int main() {
   std::cout << "Last update: " << job_info_msg_ptr->last_update << "\n";
 
   for (size_t i = 0; i < job_info_msg_ptr->record_count; i++) {
-    std::cout << "  Job " << job_info_msg_ptr->job_array[i].job_id << " : "
-              << "\n";
-    // also print the job name, partition, user and cores
-    std::cout << "    Name      : " << job_info_msg_ptr->job_array[i].name
+    std::cout << "  Job " << job_info_msg_ptr->job_array[i].job_id
+	      << " : " << job_info_msg_ptr->job_array[i].name
               << "\n";
     std::cout << "    Partition : " << job_info_msg_ptr->job_array[i].partition
               << "\n";
-    std::cout << "    User      : " << job_info_msg_ptr->job_array[i].user_name
-              << " (" << job_info_msg_ptr->job_array[i].user_id << ")"
-              << "\n";
+    std::cout << "    User      : " << job_info_msg_ptr->job_array[i].user_id
+	      << "\n";
     std::cout << "    Cores     : " << job_info_msg_ptr->job_array[i].num_cpus
               << "\n";
   }
 
-  std::cout << std::endl; // flush
-
   // free the job_info_msg_ptr
   slurm_free_job_info_msg(job_info_msg_ptr);
   job_info_msg_ptr = nullptr;
+
+  std::cout << "done" << std::endl;
 
   return 0;
 }
