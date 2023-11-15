@@ -1,3 +1,4 @@
+#include "slurm/slurm_errno.h"
 #include <ctime>
 #include <iostream>
 #include <slurm/slurm.h>
@@ -17,7 +18,11 @@ int main() {
 
   if (retval != 0) {
     std::cerr << "slurm_load_jobs() failed: " << retval << std::endl;
+
+    std::cerr << "  slurm error: " << slurm_strerror(slurm_get_errno())
+              << std::endl;
   }
+
   if (job_info_msg_ptr == nullptr) {
     std::cerr << "job_info_msg_ptr is null" << std::endl;
     return 1;
