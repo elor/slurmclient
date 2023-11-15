@@ -33,16 +33,12 @@ int main() {
     if (retval != 0) {
       std::cerr << "slurm_load_jobs() failed: " << retval << "\n";
 
+      auto slurm_errno = slurm_get_errno();
       std::cerr << "  slurm error: " << slurm_strerror(slurm_get_errno())
                 << "\n";
     }
 
-    if (job_info_msg_ptr == nullptr) {
-      std::cerr << "job_info_msg_ptr is null"
-                << "\n";
-      return 1;
-    }
-
+    if (job_info_msg_ptr != nullptr) {
     print_jobs(job_info_msg_ptr);
 
     last_update = job_info_msg_ptr->last_update;
@@ -50,6 +46,7 @@ int main() {
     // free the job_info_msg_ptr
     slurm_free_job_info_msg(job_info_msg_ptr);
     job_info_msg_ptr = nullptr;
+    }
 
     sleep(1); // seconds
   }
