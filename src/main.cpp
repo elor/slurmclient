@@ -8,13 +8,11 @@ int main() {
 
   std::cout << "SLURM API version: " << api_version << std::endl;
 
-  time_t never = time(nullptr);
-
   job_info_msg_t *job_info_msg_ptr = NULL;
 
   uint16_t show_flags = SHOW_ALL;
 
-  int retval = slurm_load_jobs(never, &job_info_msg_ptr, show_flags);
+  int retval = slurm_load_jobs((time_t)NULL, &job_info_msg_ptr, show_flags);
 
   if (retval != 0) {
     std::cerr << "slurm_load_jobs() failed: " << retval << std::endl;
