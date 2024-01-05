@@ -363,3 +363,5 @@ int main() {
 
   return 0;
 }
+
+/* vim: set shiftwidth=2 tabstop=2 expandtab: */
