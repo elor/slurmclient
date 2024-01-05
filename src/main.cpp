@@ -260,7 +260,6 @@ void print_jobs_json(job_info_msg_t *jobs) {
       {"StartTime", job.start_time},
       {"CPUs/Task", job.cpus_per_task},
       {"ExitCode", job.exit_code},
-      {"", 0},
     };
 
     /* Simple Optional keys, with `maybe(,)` helper */
