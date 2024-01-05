@@ -300,7 +300,7 @@ void print_jobs_json(job_info_msg_t *jobs) {
 
   std::cout << json.dump(2) << std::endl;
 
-  std::cout << "\nGot " << jobs->record_count << " Jobs" << std::endl;
+  std::cout << "\nGot " << jobs->record_count << " Jobs, in " << json.dump().size() << "b" << std::endl;
 }
 
 void print_jobs(job_info_msg_t *job_info_msg_ptr) {
