@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
-project(slurmclient)
+project(slurmclient VERSION 0.10.0)
 
 include(cmake/CPM.cmake)
 
