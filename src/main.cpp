@@ -1,12 +1,52 @@
 #include <ctime>
+#include <fstream>
 #include <iostream>
-#include <slurm/slurm.h>
+#include <string>
+#include <vector>
+
 #include <nlohmann/json.hpp>
+#include <slurm/slurm.h>
+#include <zlib.h>
 
 /* Docs for slurm_job_info_t:
  *
  * https://github.com/SchedMD/slurm/blob/a1223ba9bff8ddc7ac30d18930412ef6b95caa28/slurm/slurm.h#L1759-L1914
 */
+std::string compressString(const std::string& input)
+{
+  z_stream zs; // zlib stream
+  memset(&zs, 0, sizeof(zs));
+
+  if (deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15 | 16, 8, Z_DEFAULT_STRATEGY) != Z_OK)
+  {
+    return "";
+  }
+
+  zs.next_in = (Bytef*)input.data();
+  zs.avail_in = input.size();
+
+  std::vector<char> outBuffer(32768); // Output buffer for compressed data
+  std::string compressedString;
+
+  do
+  {
+    zs.next_out = reinterpret_cast<Bytef*>(outBuffer.data());
+    zs.avail_out = outBuffer.size();
+
+    int ret = deflate(&zs, Z_FINISH);
+    if (ret == Z_STREAM_ERROR)
+    {
+      deflateEnd(&zs);
+      return "";
+    }
+
+    compressedString.append(outBuffer.data(), outBuffer.size() - zs.avail_out);
+  } while (zs.avail_out == 0);
+
+  deflateEnd(&zs);
+
+  return compressedString;
+}
 
 std::string job_state_to_string(uint32_t state) {
   switch (state) {
@@ -298,9 +338,19 @@ void print_jobs_json(job_info_msg_t *jobs) {
     json[i] = jobson;
   }
 
-  std::cout << json.dump(2) << std::endl;
+  auto pretty_dump = json.dump(2);
 
-  std::cout << "\nGot " << jobs->record_count << " Jobs, in " << json.dump().size() << "b" << std::endl;
+  std::cout << pretty_dump << std::endl;
+
+  auto dense_dump = json.dump();
+  auto compressed_dump = compressString(dense_dump);
+  auto compression_percent = 100*compressed_dump.size()/dense_dump.size();
+
+  std::cout << "\nGot " << jobs->record_count << " Jobs, in " << dense_dump.size() << "b (" << compressed_dump.size() << "b gzipped = "<< compression_percent<<"%)" << std::endl;
+
+  std::ofstream outfile("jobs.json.gz", std::ios::binary);
+  outfile << compressed_dump;
+  std::cout << "compressed dump written to jobs.json.gz" << std::endl;
 }
 
 void print_jobs(job_info_msg_t *job_info_msg_ptr) {
